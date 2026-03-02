@@ -2,6 +2,8 @@ package View;
 
 import repository.NotasRepository;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Scanner;
 
 public class LoggedInterface {
@@ -13,7 +15,7 @@ public class LoggedInterface {
     }
 
 
-    public void mostrarMenuLogin() {
+    public void mostrarMenuLogin() throws IOException {
 
             System.out.println(" ===== MENU PROFESOR =====");
 
@@ -35,16 +37,27 @@ public class LoggedInterface {
 
                     System.out.println("Introduce el contenido para anotar");
                     String contenido = sc.nextLine();
-                    System.out.println("Guardando 1....");
+
                     notasRepository.guardarNota(emailSanitizado, notaTitulo, contenido);
-                    System.out.println("Guardando 2....");
+
                     break;
 
 
 
                 case 2:
+                    System.out.println("Trayendo las notas del usuario");
+                    List<String> listaNotas = notasRepository.traerNotas(this.emailSanitizado);
 
+                    if (listaNotas.isEmpty()) {
+                        System.out.println("[ERROR] El usuario no tiene notas añadidas o no han podido ser traidas");
+                    }
 
+                    for (int i = 0; i < listaNotas.size(); i++) {
+                        String linea = listaNotas.get(i);
+                        String[] partes = linea.split(";");
+
+                        System.out.println((i + 1) + ".- " + partes[0]);
+                    }
 
 
                     break;
@@ -53,8 +66,21 @@ public class LoggedInterface {
 
 
                 case 3:
+                    System.out.println("Introduce el numero de nota que quieres ver");
+                    int numeroNota = sc.nextInt();
+                    sc.nextLine();
 
 
+                    List<String> listaNotasporNumero = notasRepository.traerNotas(this.emailSanitizado);
+
+                    if (listaNotasporNumero.isEmpty()) {
+                        System.out.println("[ERROR] No hay notas con este numero asignado");
+                    }
+                    String[] partesNota = listaNotasporNumero.get(numeroNota - 1).split(";");
+                    System.out.println("---------------------------------");
+                    System.out.println("TÍTULO: " + partesNota[0]);
+                    System.out.println("CONTENIDO: " + partesNota[1]);
+                    System.out.println("---------------------------------");
 
 
                     break;
@@ -62,6 +88,10 @@ public class LoggedInterface {
 
 
                 case 4:
+                    System.out.println("Introduce el numero de la nota a borrar");
+                    int numeroNotaBorrar = sc.nextInt();
+
+                    notasRepository.eliminarNota(emailSanitizado, numeroNotaBorrar);
 
 
 

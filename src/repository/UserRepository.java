@@ -12,7 +12,7 @@ import java.io.IOException;
 public class UserRepository {
 
     public static void almacenarUsuario(Usuario usuario, String password) {
-        Path ruta = Paths.get("D:/1 DAM 2º Trimstre/PRO/UT5/FJGD-TareaEvaluativa/src/data/informacionUsuarios.txt");
+        Path ruta = Paths.get("src/data/informacionUsuarios.txt");
 
         System.out.println("Guardando en: " + ruta.toAbsolutePath());
 
@@ -33,7 +33,7 @@ public class UserRepository {
 
 
     public static boolean comprobarCredenciales(String email, String password) {
-        Path ruta = Paths.get("D:/1 DAM 2º Trimstre/PRO/UT5/FJGD-TareaEvaluativa/src/data/informacionUsuarios.txt");
+        Path ruta = Paths.get("src/data/informacionUsuarios.txt");
         String lineaBuscada = "Email: " + email + " | Pass: " + password;
 
         try {

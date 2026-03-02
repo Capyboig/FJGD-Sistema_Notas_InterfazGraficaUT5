@@ -4,6 +4,7 @@ import Service.LoginService;
 import Service.RegisterService;
 import controller.UsuarioController;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 public class View {
@@ -15,8 +16,7 @@ public class View {
 
     LoggedInterface loggedInterface = new LoggedInterface();
     RegisterService registerService = new RegisterService();
-
-    public void mostrarMenu() {
+    public void mostrarMenu() throws IOException {
 
             System.out.println("======== MENU ========");
             System.out.println("1.- Registrar Usuario");
