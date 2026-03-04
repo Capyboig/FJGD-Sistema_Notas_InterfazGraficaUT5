@@ -1,2 +1,0 @@
-Nota1;Esta nota es una nota de testeo para comprobar el funcionamiento
-nota1;Testeo de creacion de nota

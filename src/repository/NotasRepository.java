@@ -1,11 +1,12 @@
 package repository;
 
+import exceptions.NotaNoExistenteException; // Importa tu excepción
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class NotasRepository {
     private static final String RUTA_BASE = "src/data/usuarios/";
@@ -18,7 +19,6 @@ public class NotasRepository {
             if (Files.notExists(carpetaUsuario)) {
                 Files.createDirectories(carpetaUsuario);
             }
-
             String lineaNota = titulo + ";" + contenido + System.lineSeparator();
 
             Files.writeString(archivoNotas, lineaNota,
@@ -26,39 +26,49 @@ public class NotasRepository {
                     StandardOpenOption.APPEND);
 
             System.out.println("[EXITO] Nota guardada correctamente");
-            System.out.println("Guardado con el email " + emailsanitizado);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.err.println("[ERROR] No se pudo guardar la nota: " + e.getMessage());
         }
     }
 
-
-
-    public List<String> traerNotas(String emailSanitizado) throws IOException{
+    public List<String> traerNotas(String emailSanitizado) throws IOException {
         Path rutaArchivo = Paths.get(RUTA_BASE, emailSanitizado, "notas.txt");
+        List<String> notas = new ArrayList<>();
 
+        if (!Files.exists(rutaArchivo)) return notas;
 
-        if (!Files.exists(rutaArchivo)) {
-            return new ArrayList<>();
+        try (BufferedReader reader = Files.newBufferedReader(rutaArchivo)) {
+            String linea;
+            while ((linea = reader.readLine()) != null) {
+                notas.add(linea);
+            }
         }
-
-        return Files.readAllLines(rutaArchivo);
+        return notas;
     }
 
+    public String obtenerNotaPorNumero(String email, int numero) throws NotaNoExistenteException, IOException {
+        List<String> notas = traerNotas(email);
 
+        if (numero <= 0 || numero > notas.size()) {
+            throw new NotaNoExistenteException("[ERROR] La nota número " + numero + " no existe.");
+        }
 
-    public void eliminarNota(String emailSanitizado, int numeroEliminar) throws IOException {
+        return notas.get(numero - 1);
+    }
+
+    public void eliminarNota(String emailSanitizado, int numeroEliminar) throws IOException, NotaNoExistenteException {
         Path rutaArchivo = Paths.get(RUTA_BASE, emailSanitizado, "notas.txt");
         List<String> notas = traerNotas(emailSanitizado);
 
-
-        if (numeroEliminar > 0 && numeroEliminar <= notas.size()) {
-            notas.remove(numeroEliminar - 1);
-            Files.write(rutaArchivo, notas);
-            System.out.println("DEBUG: Notas restantes en lista: " + notas.size());
-            System.out.println("[EXITO] Nota eliminada correctamente.");
-        } else {
-            System.out.println("[ERROR] El número de nota no es válido.");
+        if (numeroEliminar <= 0 || numeroEliminar > notas.size()) {
+            throw new NotaNoExistenteException("[ERROR] Imposible eliminar: La nota " + numeroEliminar + " no existe.");
         }
+
+        notas.remove(numeroEliminar - 1);
+
+        // Files.write con una lista de strings escribe cada elemento en una línea nueva automáticamente
+        Files.write(rutaArchivo, notas, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+
+        System.out.println("[EXITO] Nota eliminada del fichero.");
     }
 }
