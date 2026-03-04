@@ -4,43 +4,48 @@
 ![Console](https://img.shields.io/badge/Consola-Terminal-4D4D4D?style=for-the-badge&logo=windows-terminal&logoColor=white)
 ![Git](https://img.shields.io/badge/GIT-E44C30?style=for-the-badge&logo=git&logoColor=white)
 
-Aplicación de consola en Java que permite el registro de usuarios, autenticación (login) y gestión completa de notas personales. El proyecto destaca por su persistencia de datos mediante ficheros de texto (`java.nio.file`) y una arquitectura de software limpia y estructurada en capas.
+Aplicación de consola en Java orientada a entornos empresariales que permite el registro, autenticación y gestión integral de notas personales. El proyecto destaca por su enfoque en la **seguridad criptográfica**, la **escalabilidad** y una arquitectura de software robusta.
 
 ## ✨ Características Principales
 
-### Sistema de Usuarios
-- **Registro de usuarios:** Validación de credenciales y creación de un entorno de trabajo único por usuario.
-- **Inicio de sesión (Login):** Verificación de credenciales leyendo la base de datos de texto.
-- **Sanitización de datos:** Las carpetas de usuario se generan adaptando el email (eliminando caracteres especiales como `@` y `.`).
+### 🛡️ Seguridad y Usuarios
+- **Registro Seguro:** Validación de credenciales y **encriptación de contraseñas mediante SHA-256**, garantizando que la información sensible nunca se almacene en texto plano.
+- **Autenticación Robusta:** Inicio de sesión mediante comparación de hashes criptográficos.
+- **Sanitización Automática:** Generación de directorios seguros adaptando el email del usuario (eliminación de caracteres especiales como `@` y `.`).
 
-### Gestión de Notas (CRUD)
-- **Crear nota:** Almacenamiento seguro en la carpeta personal del usuario.
-- **Listar notas:** Lectura dinámica de ficheros para mostrar todas las notas numeradas.
-- **Ver nota en detalle:** Recuperación del contenido completo mediante su identificador.
-- **Eliminar nota:** Reescritura del fichero actualizando la persistencia de datos al instante.
+### 📝 Gestión de Notas (CRUD)
+- **Operaciones Completas:** Crear, listar, visualizar en detalle y eliminar notas de forma intuitiva.
+- **Persistencia Avanzada:** Uso de `java.nio.file` combinado con bloques **try-with-resources** para una gestión eficiente y segura de los flujos de archivos (evitando fugas de memoria).
+- **Aislamiento de Datos:** Cada usuario dispone de su propio entorno de persistencia privado.
 
 ---
 
 ## 🏗️ Arquitectura del Proyecto
 
-El proyecto sigue una arquitectura en capas (basada en el patrón MVC) para separar responsabilidades y mantener el código limpio y escalable:
+El proyecto sigue una arquitectura de **N-Capas** basada en el patrón MVC (Modelo-Vista-Controlador), asegurando el desacoplamiento y la facilidad de mantenimiento:
 
-- `model`: Entidades de datos (ej. `Usuario`, `Nota`).
-- `repository`: Encargado de la persistencia de datos (lectura y escritura de ficheros `.txt`).
-- `Service`: Lógica de negocio (validaciones, algoritmos de encriptación, reglas de la app).
-- `controller`: Intermediario entre la vista y los servicios.
-- `View`: Interfaz de usuario por consola (menús y entrada de datos con `Scanner`).
-- `App`: Punto de entrada de la aplicación (`Main`).
+
+
+[Image of layered software architecture diagram]
+
+
+- **`model`**: Contiene las entidades de datos puras (POJOs) como `Usuario` y `Nota`.
+- **`repository`**: Capa de persistencia encargada de la lectura y escritura física en ficheros `.txt`.
+- **`service`**: Contiene la lógica de negocio, validaciones y algoritmos de encriptación.
+- **`controller`**: Actúa como intermediario, coordinando el flujo de datos entre la vista y los servicios.
+- **`view`**: Interfaz de usuario por consola con menús persistentes basados en bucles `do-while`.
+- **`exceptions`**: Definición de excepciones personalizadas para un manejo de errores granular (ej. `UsuarioYaExistenteException`, `NotaNoExistenteException`).
 
 ---
 
-## 📁 Estructura de Ficheros (Persistencia)
-
-Los datos se guardan localmente en la carpeta raíz del proyecto, generada de forma automática si no existe:
+## 📂 Estructura del Código Fuente
 
 ```text
-/data
-  ├── users.txt                       # Almacena "email;password" de todos los usuarios
-  └── /usuarios
-      └── /ejemplogmailcom            # Carpeta única por usuario (email sanitizado)
-          └── notas.txt               # Fichero con las notas (titulo;contenido)
+src/
+ ├── app/               # Punto de entrada de la aplicación (Main)
+ ├── controller/        # Controladores de usuario y notas
+ ├── exceptions/        # Excepciones personalizadas del sistema
+ ├── model/             # Clases de datos (Usuario, Nota)
+ ├── repository/        # Gestión de archivos y persistencia
+ ├── service/           # Lógica de seguridad (SHA-256) y validaciones
+ └── view/              # Interfaces de consola y menús de usuario
