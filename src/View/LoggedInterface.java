@@ -1,5 +1,6 @@
 package View;
 
+import exceptions.NotaNoExistenteException;
 import repository.NotasRepository;
 
 import java.io.IOException;
@@ -16,7 +17,9 @@ public class LoggedInterface {
 
 
     public void mostrarMenuLogin() throws IOException {
+        int opcionLogged = 0;
 
+        do {
             System.out.println(" ===== MENU PROFESOR =====");
 
             System.out.println("1.- Crear nota");
@@ -25,7 +28,7 @@ public class LoggedInterface {
             System.out.println("4.- Eliminar nota (por numero)");
             System.out.println("5.- Salir");
 
-            int opcionLogged = sc.nextInt();
+            opcionLogged = sc.nextInt();
             sc.nextLine();
 
 
@@ -67,22 +70,30 @@ public class LoggedInterface {
 
                 case 3:
                     System.out.println("Introduce el numero de nota que quieres ver");
+                    if (!sc.hasNextInt()) {
+                        System.out.println("[ERROR] Introduce un número válido.");
+                        sc.nextLine();
+                        break;
+                    }
                     int numeroNota = sc.nextInt();
                     sc.nextLine();
 
+                    try {
+                        String notaCompleta = notasRepository.obtenerNotaPorNumero(this.emailSanitizado, numeroNota);
 
-                    List<String> listaNotasporNumero = notasRepository.traerNotas(this.emailSanitizado);
+                        String[] partesNota = notaCompleta.split(";");
+                        System.out.println("---------------------------------");
+                        System.out.println("TÍTULO: " + partesNota[0]);
+                        System.out.println("CONTENIDO: " + partesNota[1]);
+                        System.out.println("---------------------------------");
 
-                    if (listaNotasporNumero.isEmpty()) {
-                        System.out.println("[ERROR] No hay notas con este numero asignado");
+                    } catch (exceptions.NotaNoExistenteException e) {
+                        System.out.println(e.getMessage());
+                    } catch (IOException e) {
+                        System.out.println("[ERROR] No se pudo leer el archivo de notas.");
+                    } catch (Exception e) {
+                        System.out.println("[ERROR] Algo salió mal: " + e.getMessage());
                     }
-                    String[] partesNota = listaNotasporNumero.get(numeroNota - 1).split(";");
-                    System.out.println("---------------------------------");
-                    System.out.println("TÍTULO: " + partesNota[0]);
-                    System.out.println("CONTENIDO: " + partesNota[1]);
-                    System.out.println("---------------------------------");
-
-
                     break;
 
 
@@ -105,6 +116,8 @@ public class LoggedInterface {
 
                     break;
             }
+        } while(opcionLogged != 5);
+
 
 
 

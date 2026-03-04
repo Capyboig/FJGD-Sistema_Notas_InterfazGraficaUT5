@@ -3,11 +3,16 @@ package View;
 import Service.LoginService;
 import Service.RegisterService;
 import controller.UsuarioController;
+import exceptions.UsuarioYaExistenteException;
+import repository.UserRepository;
 
 import java.io.IOException;
 import java.util.Scanner;
 
 public class View {
+
+
+
     private Scanner sc = new Scanner(System.in);
 
     public View() {
@@ -16,13 +21,15 @@ public class View {
 
     LoggedInterface loggedInterface = new LoggedInterface();
     RegisterService registerService = new RegisterService();
+    UserRepository userRepository = new UserRepository();
     public void mostrarMenu() throws IOException {
-
+        int opcionMenu = 0;
+        do{
             System.out.println("======== MENU ========");
             System.out.println("1.- Registrar Usuario");
             System.out.println("2.- Login Usuario");
             System.out.println("3.- Salir");
-            int opcionMenu = sc.nextInt();
+            opcionMenu = sc.nextInt();
             sc.nextLine();
 
 
@@ -35,13 +42,25 @@ public class View {
                     System.out.println("Introduce la contraseña");
                     String password = sc.nextLine();
 
-                    UsuarioController usuarioController = new UsuarioController(email, password);
+                    try {
 
+                        if (userRepository.existeEmail(email)) {
+                            throw new UsuarioYaExistenteException("[ERROR] El usuario ya existe en el sistema.");
+                        }
 
-                    if (!usuarioController.llamadaDeRegistro()) {
-                        System.out.println("[ERROR] El email no es válido (recuerda usar @gmail.com)");
-                    } else {
-                        System.out.println("[EXITO] Se ha registrado correctamente el usuario");
+                        UsuarioController usuarioController = new UsuarioController(email, password);
+
+                        if (!usuarioController.llamadaDeRegistro()) {
+                            System.out.println("[ERROR] El email no es válido (recuerda usar @gmail.com)");
+                        } else {
+                            System.out.println("[EXITO] Se ha registrado correctamente el usuario");
+                        }
+
+                    } catch (UsuarioYaExistenteException e) {
+
+                        System.out.println(e.getMessage());
+                    } catch (Exception e) {
+                        System.out.println("[ERROR INESPERADO] Algo ha ido mal: " + e.getMessage());
                     }
                     break;
 
@@ -83,6 +102,10 @@ public class View {
 
 
             }
+
+        } while(opcionMenu != 3);
+
+
 
 
 
